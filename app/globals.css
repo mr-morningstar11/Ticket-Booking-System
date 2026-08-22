@@ -529,11 +529,14 @@ nav a:hover, nav button:hover, nav button.active {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .event-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-4px) translateZ(0);
   border-color: var(--border-focus);
   box-shadow: 0 12px 30px rgba(0,0,0,0.5);
 }
@@ -543,8 +546,10 @@ nav a:hover, nav button:hover, nav button.active {
   aspect-ratio: 1.15;
   position: relative;
   overflow: hidden;
-  background-color: var(--muted);
+  background-color: var(--card);
   cursor: pointer;
+  margin-bottom: -2px;
+  z-index: 1;
 }
 
 .card-image {
@@ -552,23 +557,31 @@ nav a:hover, nav button:hover, nav button.active {
   height: 100%;
   background-position: center;
   background-size: cover;
-  transition: transform 0.4s ease;
+  transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
-.card-image-wrap:hover .card-image {
-  transform: scale(1.05);
+.event-card:hover .card-image {
+  transform: scale(1.06) translateZ(0);
 }
 
 .card-image-wrap:after {
   content: '';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(transparent 40%, rgba(13, 18, 23, 0.95));
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  background: linear-gradient(to bottom, transparent 35%, rgba(22, 30, 37, 0.6) 70%, var(--card) 98%, var(--card) 100%);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .tag, .heart-btn {
   position: absolute;
-  z-index: 2;
+  z-index: 3;
 }
 
 .tag {
@@ -613,6 +626,9 @@ nav a:hover, nav button:hover, nav button.active {
   display: flex;
   flex-direction: column;
   flex: 1;
+  background: var(--card);
+  position: relative;
+  z-index: 2;
 }
 
 .card-top {
