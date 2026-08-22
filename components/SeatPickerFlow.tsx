@@ -258,19 +258,19 @@ export function SeatPickerFlow({
 
   const activeStandObject = concertStands.find(s => s.id === activeConcertStand) || concertStands[0]
 
-  // Scaled Up Inner Circle Arc Geometry:
+  // Scaled Up Stadium Arena Arc Geometry:
   // Center: (300, 270)
   // Inner Radius: Rin = 125, Outer Radius: Rout = 215
   const cx = 300
   const cy = 270
 
-  const lowerCPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, 185, 225), [])
-  const lowerFPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, 315, 355), [])
-  const lowerBPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, 140, 180), [])
-  const lowerGPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, 0, 40), [])
-  const lowerAPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, 108, 135), [])
-  const lowerHPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, 45, 72), [])
-  const southPremPath = useMemo(() => createAnnularSector(cx, cy, 120, 220, 74, 106), [])
+  const lowerCPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, 188, 235), [])
+  const lowerFPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, 305, 352), [])
+  const lowerBPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, 140, 185), [])
+  const lowerGPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, -5, 40), [])
+  const lowerAPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, 107, 137), [])
+  const lowerHPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, 43, 73), [])
+  const southPremPath = useMemo(() => createAnnularSector(cx, cy, 120, 220, 76, 104), [])
 
   return (
     <section className="flow max-w-6xl mx-auto">
@@ -384,7 +384,7 @@ export function SeatPickerFlow({
                   <circle cx="300" cy="270" r="235" fill="transparent" stroke="rgba(56, 189, 248, 0.2)" strokeDasharray="5 5" strokeWidth="1.5" />
 
                   {/* ---------------- INNER CONCENTRIC STANDS ---------------- */}
-                  {/* Lower C */}
+                  {/* Lower C (Stage Left Wing) */}
                   <path
                     d={lowerCPath}
                     fill="url(#gradLowerCF)"
@@ -395,7 +395,7 @@ export function SeatPickerFlow({
                     onClick={() => setActiveConcertStand('LOWER_CF')}
                   />
 
-                  {/* Lower F */}
+                  {/* Lower F (Stage Right Wing) */}
                   <path
                     d={lowerFPath}
                     fill="url(#gradLowerCF)"
