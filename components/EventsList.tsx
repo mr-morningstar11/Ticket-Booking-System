@@ -41,7 +41,7 @@ export function EventsList({
   const [isCityMenuOpen, setIsCityMenuOpen] = useState(false)
 
   const cities = ['All Cities', 'Delhi NCR', 'Gurugram', 'Delhi', 'Noida', 'Bengaluru', 'Mumbai', 'Chennai']
-  const categoriesList = ['All events', 'Movies', 'Concerts', 'Delhi NCR', 'Bengaluru', 'Mumbai', 'Favorites']
+  const categoriesList = ['All events', 'Upcoming', 'Now Showing', 'Movies', 'Concerts', 'Delhi NCR', 'Bengaluru', 'Mumbai', 'Favorites']
 
   return (
     <>
@@ -104,7 +104,7 @@ export function EventsList({
                 className={category === c ? 'filter active' : 'filter'}
                 onClick={() => onSelectCategory(c)}
               >
-                {c === 'Favorites' ? `❤️ Favorites (${likedEvents.length})` : c}
+                {c === 'Favorites' ? `❤️ Favorites (${likedEvents.length})` : c === 'Upcoming' ? '✨ Upcoming' : c === 'Now Showing' ? '🔥 Now Showing' : c}
               </button>
             ))}
           </div>
@@ -153,12 +153,14 @@ export function EventsList({
           <div className="event-grid">
             {filteredEvents.map(event => {
               const isLiked = likedEvents.includes(event.event_id)
-              const dateObj = new Date(event.start_date)
+              const [y, m, d] = (event.start_date || '').split('-').map(Number)
+              const dateObj = y && m && d ? new Date(y, m - 1, d) : new Date(event.start_date)
               const monthStr = dateObj.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()
               const dayStr = dateObj.getDate()
+              const isUpcoming = event.status === 'UPCOMING'
 
               return (
-                <article key={event.event_id} className="event-card">
+                <article key={event.event_id} className={`event-card ${isUpcoming ? 'event-card-upcoming' : ''}`}>
                   <div className="card-image-wrap" onClick={() => onSelectEvent(event)}>
                     <div
                       className="card-image"
@@ -166,7 +168,9 @@ export function EventsList({
                         backgroundImage: `url(${event.poster_url || event.banner_url || 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=800&q=80'})`,
                       }}
                     />
-                    <span className="tag">{event.status === 'ONGOING' ? 'NOW SHOWING' : event.event_type}</span>
+                    <span className={`tag ${isUpcoming ? 'tag-upcoming' : ''}`}>
+                      {isUpcoming ? '✨ UPCOMING' : '🔥 NOW SHOWING'}
+                    </span>
                     <button
                       className={`heart-btn ${isLiked ? 'liked' : ''}`}
                       onClick={e => onToggleLike(e, event.event_id)}
@@ -205,11 +209,11 @@ export function EventsList({
 
                     <div className="card-footer">
                       <div className="price">
-                        <small>Tickets from</small>
+                        <small>{isUpcoming ? 'Advance tickets' : 'Tickets from'}</small>
                         <strong>₹{event.base_price}</strong>
                       </div>
-                      <button className="book-btn" onClick={() => onSelectEvent(event)}>
-                        Book Now
+                      <button className={`book-btn ${isUpcoming ? 'book-btn-upcoming' : ''}`} onClick={() => onSelectEvent(event)}>
+                        {isUpcoming ? 'Pre-Book' : 'Book Now'}
                       </button>
                     </div>
                   </div>

@@ -787,12 +787,53 @@ nav a:hover, nav button:hover, nav button.active {
   margin-bottom: 30px;
 }
 
+.tag-upcoming {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #0b0f14;
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+  font-weight: 900;
+}
+
+.event-card-upcoming:hover {
+  border-color: rgba(245, 158, 11, 0.5);
+  box-shadow: 0 12px 30px rgba(245, 158, 11, 0.15);
+}
+
+.book-btn-upcoming {
+  background: linear-gradient(135deg, #f59e0b, #ea580c) !important;
+  color: #fff !important;
+}
+
+.book-btn-upcoming:hover {
+  background: linear-gradient(135deg, #d97706, #c2410c) !important;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+}
+
 .show-dates {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
   overflow-x: auto;
-  padding-bottom: 6px;
+  padding-bottom: 10px;
+  scroll-behavior: smooth;
+}
+
+.show-dates::-webkit-scrollbar {
+  height: 6px;
+}
+
+.show-dates::-webkit-scrollbar-track {
+  background: var(--surface-raised);
+  border-radius: 4px;
+}
+
+.show-dates::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.show-dates::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
 }
 
 .date-pill {
@@ -803,6 +844,15 @@ nav a:hover, nav button:hover, nav button.active {
   font-size: 12px;
   text-align: center;
   min-width: 90px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.date-pill:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  background: var(--surface);
 }
 
 .date-pill.active {
@@ -810,6 +860,8 @@ nav a:hover, nav button:hover, nav button.active {
   color: var(--primary-foreground);
   border-color: var(--primary);
   font-weight: 700;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--primary-glow);
 }
 
 .showtime-slots {

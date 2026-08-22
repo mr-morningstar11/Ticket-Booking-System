@@ -29,7 +29,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         sh.*,
         v.name as venue_name, v.address as venue_address, v.city as venue_city, v.region as venue_region,
         sc.name as screen_name, sc.screen_type, sc.total_seats,
-        (SELECT COUNT(*) FROM show_seats ss WHERE ss.show_id = sh.show_id AND ss.status = 'AVAILABLE') as available_seats_count
+        COALESCE(
+          (SELECT COUNT(*) FROM show_seats ss WHERE ss.show_id = sh.show_id AND ss.status = 'AVAILABLE'),
+          (SELECT COUNT(*) FROM seats s WHERE s.screen_id = sh.screen_id)
+        ) as available_seats_count
       FROM shows sh
       JOIN venues v ON sh.venue_id = v.venue_id
       LEFT JOIN screens sc ON sh.screen_id = sc.screen_id

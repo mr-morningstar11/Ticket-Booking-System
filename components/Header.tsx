@@ -40,6 +40,12 @@ export function Header({
           Movies
         </button>
         <button
+          className={stage === 'browse' && category === 'Upcoming' ? 'active' : ''}
+          onClick={() => onNavigate('browse', 'Upcoming')}
+        >
+          Upcoming
+        </button>
+        <button
           className={stage === 'browse' && category === 'Concerts' ? 'active' : ''}
           onClick={() => onNavigate('browse', 'Concerts')}
         >

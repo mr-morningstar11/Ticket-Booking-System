@@ -337,6 +337,8 @@ export default function Page() {
   // Filtered Events
   const filteredEvents = useMemo(() => {
     return events.filter(e => {
+      if (category === 'Upcoming' && e.status !== 'UPCOMING') return false
+      if (category === 'Now Showing' && e.status !== 'ONGOING') return false
       if (category === 'Movies' && e.event_type !== 'MOVIE') return false
       if (category === 'Concerts' && e.event_type !== 'CONCERT') return false
       if (category === 'Favorites' && !likedEvents.includes(e.event_id)) return false
@@ -417,6 +419,7 @@ export default function Page() {
             <div className="grid gap-3">
               <button className="outline-btn text-left justify-start" onClick={() => { setStage('browse'); setCategory('All events'); setIsMobileMenuOpen(false) }}>Discover Events</button>
               <button className="outline-btn text-left justify-start" onClick={() => { setStage('browse'); setCategory('Movies'); setIsMobileMenuOpen(false) }}>Movies</button>
+              <button className="outline-btn text-left justify-start" onClick={() => { setStage('browse'); setCategory('Upcoming'); setIsMobileMenuOpen(false) }}>✨ Upcoming</button>
               <button className="outline-btn text-left justify-start" onClick={() => { setStage('browse'); setCategory('Concerts'); setIsMobileMenuOpen(false) }}>Concerts</button>
               <button className="outline-btn text-left justify-start" onClick={() => { fetchUserBookings(); setStage('bookings'); setIsMobileMenuOpen(false) }}>My Bookings</button>
               <button className="outline-btn text-left justify-start" onClick={() => { setIsUserModalOpen(true); setIsMobileMenuOpen(false) }}>Switch Profile ({currentUser.name})</button>

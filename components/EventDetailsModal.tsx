@@ -63,7 +63,18 @@ export function EventDetailsModal({
 
         {/* Metadata & Shows */}
         <div className="lg:col-span-2">
-          <div className="eyebrow mb-2">{selectedEvent.event_type} · {selectedEvent.age_rating || 'UA'}</div>
+          <div className="flex items-center gap-2 flex-wrap mb-2">
+            <div className="eyebrow">{selectedEvent.event_type} · {selectedEvent.age_rating || 'UA'}</div>
+            {selectedEvent.status === 'UPCOMING' ? (
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                ✨ UPCOMING RELEASE
+              </span>
+            ) : (
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                🔥 NOW SHOWING
+              </span>
+            )}
+          </div>
           <h1 className="text-4xl font-extrabold mb-3">{selectedEvent.title}</h1>
           <p className="text-muted-foreground text-sm mb-6 leading-relaxed">{selectedEvent.description}</p>
 
@@ -104,24 +115,39 @@ export function EventDetailsModal({
           {/* Showtimes */}
           <div className="shows-container">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold">Select Show & Time</h3>
-              <span className="text-xs text-muted-foreground">Select a time to view seat map</span>
+              <div>
+                <h3 className="text-lg font-bold">
+                  Select Show & Time
+                </h3>
+                <span className="text-xs text-muted-foreground">
+                  {uniqueDates.length} dates available for booking
+                </span>
+              </div>
+              <span className="text-xs text-primary font-semibold">
+                {selectedEvent.status === 'UPCOMING' ? '✨ Advance Booking' : '⚡ Instant Confirmation'}
+              </span>
             </div>
 
             {eventDetails.shows && eventDetails.shows.length > 0 ? (
               <>
                 {/* Date Pills */}
                 <div className="show-dates">
-                  {uniqueDates.map(d => (
-                    <button
-                      key={d}
-                      className={`date-pill ${selectedDate === d ? 'active' : ''}`}
-                      onClick={() => onSelectDate(d)}
-                    >
-                      <strong>{new Date(d).toLocaleDateString('en-US', { weekday: 'short' })}</strong>
-                      <div>{new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                    </button>
-                  ))}
+                  {uniqueDates.map(d => {
+                    const [y, m, day] = d.split('-').map(Number)
+                    const dateObj = y && m && day ? new Date(y, m - 1, day) : new Date(d)
+                    const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' })
+                    const monthDay = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                    return (
+                      <button
+                        key={d}
+                        className={`date-pill ${selectedDate === d ? 'active' : ''}`}
+                        onClick={() => onSelectDate(d)}
+                      >
+                        <strong>{weekday}</strong>
+                        <div>{monthDay}</div>
+                      </button>
+                    )
+                  })}
                 </div>
 
                 {/* Show Slots */}
