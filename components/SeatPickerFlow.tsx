@@ -1,7 +1,8 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { ArrowLeft, ArrowRight, Clock3, Sparkles, User, Info, Check, RotateCcw, MapPin, Disc3, Music2 } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Clock3, Sparkles, User, Info, Check, RotateCcw, MapPin, Disc3, Music2, Layers } from 'lucide-react'
+import Orb from './Orb'
 
 interface SeatPickerFlowProps {
   selectedEvent: any
@@ -13,6 +14,25 @@ interface SeatPickerFlowProps {
   onBack: () => void
   onToggleSeat: (seat: any) => void
   onContinue: () => void
+}
+
+// Polar to Cartesian Annular Sector Path Generator
+function createAnnularSector(cx: number, cy: number, rIn: number, rOut: number, startDeg: number, endDeg: number): string {
+  const toRad = (deg: number) => (deg * Math.PI) / 180
+  const startRad = toRad(startDeg)
+  const endRad = toRad(endDeg)
+
+  const x1 = cx + rOut * Math.cos(startRad)
+  const y1 = cy + rOut * Math.sin(startRad)
+  const x2 = cx + rOut * Math.cos(endRad)
+  const y2 = cy + rOut * Math.sin(endRad)
+  const x3 = cx + rIn * Math.cos(endRad)
+  const y3 = cy + rIn * Math.sin(endRad)
+  const x4 = cx + rIn * Math.cos(startRad)
+  const y4 = cy + rIn * Math.sin(startRad)
+
+  const largeArc = Math.abs(endDeg - startDeg) > 180 ? 1 : 0
+  return `M ${x1.toFixed(1)},${y1.toFixed(1)} A ${rOut},${rOut} 0 ${largeArc},1 ${x2.toFixed(1)},${y2.toFixed(1)} L ${x3.toFixed(1)},${y3.toFixed(1)} A ${rIn},${rIn} 0 ${largeArc},0 ${x4.toFixed(1)},${y4.toFixed(1)} Z`
 }
 
 // Sleek Cinema Armchair Icon matching movie reference
@@ -54,7 +74,7 @@ export function SeatPickerFlow({
   onContinue,
 }: SeatPickerFlowProps) {
   const [hoveredSeat, setHoveredSeat] = useState<any | null>(null)
-  const [activeConcertStand, setActiveConcertStand] = useState<string>('ALL')
+  const [activeConcertStand, setActiveConcertStand] = useState<string>('FLOOR')
 
   const isConcert = selectedEvent?.event_type === 'CONCERT'
 
@@ -64,10 +84,9 @@ export function SeatPickerFlow({
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
   }
 
-  // Group seats by tier/category and rows for Cinema mode
+  // Cinema Tier grouping
   const cinemaSections = useMemo(() => {
     const rowsMap: { [key: string]: any[] } = {}
-    
     showSeats.forEach(seat => {
       if (!rowsMap[seat.row_label]) rowsMap[seat.row_label] = []
       rowsMap[seat.row_label].push(seat)
@@ -146,100 +165,70 @@ export function SeatPickerFlow({
     return result
   }, [showSeats, selectedShow])
 
-  // Concert Stadium Zones based on reference image
+  // Concentric Inner-Circle Stadium Stands
   const concertStands = useMemo(() => {
     const basePrice = selectedShow.ticket_price || 2500
     
-    // Map seats to authentic stadium zones
-    const floorSeats = showSeats.filter(s => s.row_label === 'A')
-    const lowerCFSeats = showSeats.filter(s => s.row_label === 'B')
-    const lowerBGSeats = showSeats.filter(s => s.row_label === 'C')
-    const lowerAHSeats = showSeats.filter(s => s.row_label === 'D')
-    const upperLPSeats = showSeats.filter(s => s.row_label === 'E')
-    const upperKQSeats = showSeats.filter(s => s.row_label === 'F')
-    const upperJRSeats = showSeats.filter(s => s.row_label === 'G')
-    const southPremiumSeats = showSeats.filter(s => s.row_label === 'H')
-
     return [
       {
         id: 'FLOOR',
+        code: 'GA',
         name: 'Standing (Floor)',
         tag: 'GENERAL ADMISSION',
         price: Math.round(basePrice * 2.5),
-        color: '#c8a364',
-        textColor: '#000000',
-        seats: floorSeats,
-        description: 'Direct Stage & Runway Front Access'
+        color: '#6366f1', // Electric Indigo
+        textColor: '#ffffff',
+        seats: showSeats.filter(s => s.row_label === 'A' || s.row_label === 'B'),
+        description: 'Direct Stage & Runway Front Access · Unreserved Standing Arena',
+        viewRating: '★★★★★ Center Front',
       },
       {
         id: 'SOUTH_PREMIUM',
-        name: 'South Premium (West, Center, East)',
+        code: 'SP',
+        name: 'South Premium',
         tag: 'VVIP ELEVATED',
         price: Math.round(basePrice * 4.8),
-        color: '#f59e0b',
+        color: '#f59e0b', // Radiant Gold
         textColor: '#000000',
-        seats: southPremiumSeats,
-        description: 'Prime Center Elevated Panoramic View'
+        seats: showSeats.filter(s => s.row_label === 'H'),
+        description: 'Prime Center Elevated Panoramic Direct Stage Perspective',
+        viewRating: '★★★★★ Best Overall',
       },
       {
         id: 'LOWER_AH',
+        code: 'L-AH',
         name: 'Lower Stand - A & H',
         tag: 'LOWER BOWL',
         price: Math.round(basePrice * 3.6),
-        color: '#38bdf8',
+        color: '#06b6d4', // Electric Cyan Turquoise
         textColor: '#000000',
-        seats: lowerAHSeats,
-        description: 'Close Proximity Wing Stands'
+        seats: showSeats.filter(s => s.row_label === 'F' || s.row_label === 'G'),
+        description: 'Close Proximity Wing Stands with Direct Performer Sightline',
+        viewRating: '★★★★☆ Stage Wings',
       },
       {
         id: 'LOWER_BG',
+        code: 'L-BG',
         name: 'Lower Stand - B & G',
         tag: 'LOWER BOWL',
         price: Math.round(basePrice * 1.8),
-        color: '#06b6d4',
+        color: '#10b981', // Bright Emerald Mint
         textColor: '#000000',
-        seats: lowerBGSeats,
-        description: 'Side Lower Tier Arena View'
+        seats: showSeats.filter(s => s.row_label === 'D' || s.row_label === 'E'),
+        description: 'Side Lower Tier Arena View with Crystal Clear Acoustics',
+        viewRating: '★★★★☆ Lower Mid',
       },
       {
         id: 'LOWER_CF',
+        code: 'L-CF',
         name: 'Lower Stand - C & F',
         tag: 'LOWER BOWL',
         price: Math.round(basePrice * 1.2),
-        color: '#10b981',
-        textColor: '#000000',
-        seats: lowerCFSeats,
-        description: 'Side Stage Wing Seating'
-      },
-      {
-        id: 'UPPER_JR',
-        name: 'Upper Stand - J & R',
-        tag: 'UPPER TIER',
-        price: Math.round(basePrice * 2.4),
-        color: '#fb7185',
-        textColor: '#000000',
-        seats: upperJRSeats,
-        description: 'Mid Upper Deck Center Perspective'
-      },
-      {
-        id: 'UPPER_KQ',
-        name: 'Upper Stand - K & Q',
-        tag: 'UPPER TIER',
-        price: Math.round(basePrice * 1.4),
-        color: '#c084fc',
-        textColor: '#000000',
-        seats: upperKQSeats,
-        description: 'Side Upper Stadium Deck'
-      },
-      {
-        id: 'UPPER_LP',
-        name: 'Upper Stand - L & P',
-        tag: 'UPPER TIER',
-        price: Math.round(basePrice * 1.0),
-        color: '#f43f5e',
+        color: '#ef4444', // Vibrant Crimson Red
         textColor: '#ffffff',
-        seats: upperLPSeats,
-        description: 'Upper Wing Stage Overview'
+        seats: showSeats.filter(s => s.row_label === 'C'),
+        description: 'Side Stage Wing Seating with Close Performer Proximity',
+        viewRating: '★★★☆☆ Side Stage',
       },
     ]
   }, [showSeats, selectedShow])
@@ -262,12 +251,24 @@ export function SeatPickerFlow({
 
   const availableCount = showSeats.filter(s => s.status !== 'BOOKED').length
 
-  const filteredConcertStands = activeConcertStand === 'ALL'
-    ? concertStands
-    : concertStands.filter(s => s.id === activeConcertStand)
+  const activeStandObject = concertStands.find(s => s.id === activeConcertStand) || concertStands[0]
+
+  // Scaled Up Inner Circle Arc Geometry:
+  // Center: (300, 270)
+  // Inner Radius: Rin = 125, Outer Radius: Rout = 215
+  const cx = 300
+  const cy = 270
+
+  const lowerCPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, 185, 225), [])
+  const lowerFPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, 315, 355), [])
+  const lowerBPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, 140, 180), [])
+  const lowerGPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, 0, 40), [])
+  const lowerAPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, 108, 135), [])
+  const lowerHPath = useMemo(() => createAnnularSector(cx, cy, 125, 215, 45, 72), [])
+  const southPremPath = useMemo(() => createAnnularSector(cx, cy, 120, 220, 74, 106), [])
 
   return (
-    <section className="flow max-w-5xl mx-auto">
+    <section className="flow max-w-6xl mx-auto">
       <button className="back" onClick={onBack}>
         <ArrowLeft size={16} /> Back to show details
       </button>
@@ -295,6 +296,17 @@ export function SeatPickerFlow({
       {/* ===================== STADIUM CONCERT MODE ===================== */}
       {isConcert ? (
         <div className="stadium-container">
+          {/* Dynamic WebGL Ambient Orb Background from React Bits */}
+          <div className="stadium-orb-backdrop">
+            <Orb
+              hue={263}
+              hoverIntensity={0.35}
+              rotateOnHover={true}
+              forceHoverState={false}
+              backgroundColor="#080d16"
+            />
+          </div>
+
           {/* Concert Tour Subheader Banner */}
           <div className="concert-stadium-header">
             <div className="flex items-center justify-center gap-2 mb-1">
@@ -310,336 +322,251 @@ export function SeatPickerFlow({
             <p className="text-xs text-sky-200 opacity-90">{selectedShow.show_date}</p>
           </div>
 
-          {/* Interactive SVG Stadium Map (Modeled after Coldplay Narendra Modi Stadium reference) */}
-          <div className="stadium-map-wrapper">
-            <svg
-              viewBox="0 0 700 520"
-              className="w-full max-w-[620px] mx-auto filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.8)]"
-            >
-              <defs>
-                {/* Stage Lighting Glow */}
-                <radialGradient id="stageGlow" cx="50%" cy="30%" r="50%">
-                  <stop offset="0%" stopColor="rgba(255,255,255,0.9)" />
-                  <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-                </radialGradient>
-                {/* Field Background Radial */}
-                <radialGradient id="stadiumGrass" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#1e3a8a" />
-                  <stop offset="60%" stopColor="#0f172a" />
-                  <stop offset="100%" stopColor="#020617" />
-                </radialGradient>
-              </defs>
+          {/* Side-by-Side 2-Column Split: Enlarged Inner-Circle Map on Left, Stand Details on Right */}
+          <div className="stadium-split-layout">
+            
+            {/* LEFT COLUMN: Enlarged Inner-Circle Stadium Map */}
+            <div className="stadium-map-column">
+              <div className="stadium-map-wrapper w-full">
+                <svg
+                  viewBox="0 0 600 540"
+                  className="w-full max-w-[540px] mx-auto filter drop-shadow-[0_20px_40px_rgba(0,0,0,0.9)]"
+                >
+                  <defs>
+                    <radialGradient id="stadiumGrass" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="#132338" />
+                      <stop offset="70%" stopColor="#0a121e" />
+                      <stop offset="100%" stopColor="#05080e" />
+                    </radialGradient>
+                  </defs>
 
-              {/* Stadium Bowl Base */}
-              <circle cx="350" cy="270" r="240" fill="url(#stadiumGrass)" stroke="#1e293b" strokeWidth="2" />
+                  {/* Stadium Base Plate (Transparent / Subtle Dashed Outline) */}
+                  <circle cx="300" cy="270" r="235" fill="transparent" stroke="rgba(56, 189, 248, 0.2)" strokeDasharray="5 5" strokeWidth="1.5" />
 
-              {/* ---------------- UPPER STANDS (OUTER RING) ---------------- */}
-              {/* Upper L (Left Stage View: Pink) */}
-              <path
-                d="M 130,220 A 230,230 0 0,1 230,80 L 260,120 A 180,180 0 0,0 175,230 Z"
-                fill="#f43f5e"
-                opacity={activeConcertStand === 'ALL' || activeConcertStand === 'UPPER_LP' ? 0.9 : 0.35}
-                className="cursor-pointer transition-all hover:opacity-100 hover:brightness-125"
-                onClick={() => setActiveConcertStand(activeConcertStand === 'UPPER_LP' ? 'ALL' : 'UPPER_LP')}
-              />
-              <text x="180" y="150" fill="#fff" fontSize="11" fontWeight="800" textAnchor="middle">UPPER L</text>
-              <text x="180" y="165" fill="#fff" fontSize="9" fontWeight="700" textAnchor="middle">₹2,500</text>
+                  {/* ---------------- INNER CONCENTRIC STANDS ---------------- */}
+                  {/* Lower C */}
+                  <path
+                    d={lowerCPath}
+                    fill="#ef4444"
+                    stroke={activeConcertStand === 'LOWER_CF' ? '#ffffff' : '#1e293b'}
+                    strokeWidth={activeConcertStand === 'LOWER_CF' ? 4 : 2}
+                    opacity={activeConcertStand === 'LOWER_CF' ? 1 : 0.85}
+                    className="cursor-pointer transition-all duration-200 hover:brightness-125 hover:stroke-white"
+                    onClick={() => setActiveConcertStand('LOWER_CF')}
+                  />
 
-              {/* Upper P (Right Stage View: Pink) */}
-              <path
-                d="M 470,80 A 230,230 0 0,1 570,220 L 525,230 A 180,180 0 0,0 440,120 Z"
-                fill="#f43f5e"
-                opacity={activeConcertStand === 'ALL' || activeConcertStand === 'UPPER_LP' ? 0.9 : 0.35}
-                className="cursor-pointer transition-all hover:opacity-100 hover:brightness-125"
-                onClick={() => setActiveConcertStand(activeConcertStand === 'UPPER_LP' ? 'ALL' : 'UPPER_LP')}
-              />
-              <text x="520" y="150" fill="#fff" fontSize="11" fontWeight="800" textAnchor="middle">UPPER P</text>
-              <text x="520" y="165" fill="#fff" fontSize="9" fontWeight="700" textAnchor="middle">₹2,500</text>
+                  {/* Lower F */}
+                  <path
+                    d={lowerFPath}
+                    fill="#ef4444"
+                    stroke={activeConcertStand === 'LOWER_CF' ? '#ffffff' : '#1e293b'}
+                    strokeWidth={activeConcertStand === 'LOWER_CF' ? 4 : 2}
+                    opacity={activeConcertStand === 'LOWER_CF' ? 1 : 0.85}
+                    className="cursor-pointer transition-all duration-200 hover:brightness-125 hover:stroke-white"
+                    onClick={() => setActiveConcertStand('LOWER_CF')}
+                  />
 
-              {/* Upper K (Left Mid: Lavender) */}
-              <path
-                d="M 115,240 A 235,235 0 0,0 160,370 L 205,345 A 180,180 0 0,1 170,245 Z"
-                fill="#c084fc"
-                opacity={activeConcertStand === 'ALL' || activeConcertStand === 'UPPER_KQ' ? 0.9 : 0.35}
-                className="cursor-pointer transition-all hover:opacity-100 hover:brightness-125"
-                onClick={() => setActiveConcertStand(activeConcertStand === 'UPPER_KQ' ? 'ALL' : 'UPPER_KQ')}
-              />
-              <text x="150" y="300" fill="#000" fontSize="11" fontWeight="900" textAnchor="middle">UPPER K</text>
-              <text x="150" y="315" fill="#000" fontSize="9" fontWeight="800" textAnchor="middle">₹3,500</text>
+                  {/* Lower B */}
+                  <path
+                    d={lowerBPath}
+                    fill="#10b981"
+                    stroke={activeConcertStand === 'LOWER_BG' ? '#ffffff' : '#1e293b'}
+                    strokeWidth={activeConcertStand === 'LOWER_BG' ? 4 : 2}
+                    opacity={activeConcertStand === 'LOWER_BG' ? 1 : 0.85}
+                    className="cursor-pointer transition-all duration-200 hover:brightness-125 hover:stroke-white"
+                    onClick={() => setActiveConcertStand('LOWER_BG')}
+                  />
 
-              {/* Upper Q (Right Mid: Lavender) */}
-              <path
-                d="M 585,240 A 235,235 0 0,1 540,370 L 495,345 A 180,180 0 0,0 530,245 Z"
-                fill="#c084fc"
-                opacity={activeConcertStand === 'ALL' || activeConcertStand === 'UPPER_KQ' ? 0.9 : 0.35}
-                className="cursor-pointer transition-all hover:opacity-100 hover:brightness-125"
-                onClick={() => setActiveConcertStand(activeConcertStand === 'UPPER_KQ' ? 'ALL' : 'UPPER_KQ')}
-              />
-              <text x="550" y="300" fill="#000" fontSize="11" fontWeight="900" textAnchor="middle">UPPER Q</text>
-              <text x="550" y="315" fill="#000" fontSize="9" fontWeight="800" textAnchor="middle">₹3,500</text>
+                  {/* Lower G */}
+                  <path
+                    d={lowerGPath}
+                    fill="#10b981"
+                    stroke={activeConcertStand === 'LOWER_BG' ? '#ffffff' : '#1e293b'}
+                    strokeWidth={activeConcertStand === 'LOWER_BG' ? 4 : 2}
+                    opacity={activeConcertStand === 'LOWER_BG' ? 1 : 0.85}
+                    className="cursor-pointer transition-all duration-200 hover:brightness-125 hover:stroke-white"
+                    onClick={() => setActiveConcertStand('LOWER_BG')}
+                  />
 
-              {/* Upper J (Left Rear: Rose) */}
-              <path
-                d="M 175,390 A 235,235 0 0,0 260,465 L 285,420 A 180,180 0 0,1 215,365 Z"
-                fill="#fb7185"
-                opacity={activeConcertStand === 'ALL' || activeConcertStand === 'UPPER_JR' ? 0.9 : 0.35}
-                className="cursor-pointer transition-all hover:opacity-100 hover:brightness-125"
-                onClick={() => setActiveConcertStand(activeConcertStand === 'UPPER_JR' ? 'ALL' : 'UPPER_JR')}
-              />
-              <text x="230" y="425" fill="#000" fontSize="11" fontWeight="900" textAnchor="middle">UPPER J</text>
-              <text x="230" y="440" fill="#000" fontSize="9" fontWeight="800" textAnchor="middle">₹6,500</text>
+                  {/* Lower A */}
+                  <path
+                    d={lowerAPath}
+                    fill="#06b6d4"
+                    stroke={activeConcertStand === 'LOWER_AH' ? '#ffffff' : '#1e293b'}
+                    strokeWidth={activeConcertStand === 'LOWER_AH' ? 4 : 2}
+                    opacity={activeConcertStand === 'LOWER_AH' ? 1 : 0.85}
+                    className="cursor-pointer transition-all duration-200 hover:brightness-125 hover:stroke-white"
+                    onClick={() => setActiveConcertStand('LOWER_AH')}
+                  />
 
-              {/* Upper R (Right Rear: Rose) */}
-              <path
-                d="M 525,390 A 235,235 0 0,1 440,465 L 415,420 A 180,180 0 0,0 485,365 Z"
-                fill="#fb7185"
-                opacity={activeConcertStand === 'ALL' || activeConcertStand === 'UPPER_JR' ? 0.9 : 0.35}
-                className="cursor-pointer transition-all hover:opacity-100 hover:brightness-125"
-                onClick={() => setActiveConcertStand(activeConcertStand === 'UPPER_JR' ? 'ALL' : 'UPPER_JR')}
-              />
-              <text x="470" y="425" fill="#000" fontSize="11" fontWeight="900" textAnchor="middle">UPPER R</text>
-              <text x="470" y="440" fill="#000" fontSize="9" fontWeight="800" textAnchor="middle">₹6,500</text>
+                  {/* Lower H */}
+                  <path
+                    d={lowerHPath}
+                    fill="#06b6d4"
+                    stroke={activeConcertStand === 'LOWER_AH' ? '#ffffff' : '#1e293b'}
+                    strokeWidth={activeConcertStand === 'LOWER_AH' ? 4 : 2}
+                    opacity={activeConcertStand === 'LOWER_AH' ? 1 : 0.85}
+                    className="cursor-pointer transition-all duration-200 hover:brightness-125 hover:stroke-white"
+                    onClick={() => setActiveConcertStand('LOWER_AH')}
+                  />
 
-              {/* ---------------- LOWER STANDS (INNER RING) ---------------- */}
-              {/* Lower C (Left Stage: Emerald) */}
-              <path
-                d="M 235,160 A 145,145 0 0,0 195,235 L 235,245 A 105,105 0 0,1 265,190 Z"
-                fill="#10b981"
-                opacity={activeConcertStand === 'ALL' || activeConcertStand === 'LOWER_CF' ? 0.95 : 0.35}
-                className="cursor-pointer transition-all hover:opacity-100 hover:brightness-125"
-                onClick={() => setActiveConcertStand(activeConcertStand === 'LOWER_CF' ? 'ALL' : 'LOWER_CF')}
-              />
-              <text x="225" y="200" fill="#000" fontSize="10" fontWeight="900" textAnchor="middle">LOWER C</text>
-              <text x="225" y="213" fill="#000" fontSize="8" fontWeight="800" textAnchor="middle">₹3,000</text>
+                  {/* ---------------- SOUTH PREMIUM (CENTER ELEVATED) ---------------- */}
+                  <path
+                    d={southPremPath}
+                    fill="#f59e0b"
+                    stroke={activeConcertStand === 'SOUTH_PREMIUM' ? '#ffffff' : '#fbbf24'}
+                    strokeWidth={activeConcertStand === 'SOUTH_PREMIUM' ? 4 : 2.5}
+                    opacity={activeConcertStand === 'SOUTH_PREMIUM' ? 1 : 0.85}
+                    className="cursor-pointer transition-all duration-200 hover:brightness-125 hover:stroke-white filter drop-shadow-[0_0_15px_rgba(245,158,11,0.6)]"
+                    onClick={() => setActiveConcertStand('SOUTH_PREMIUM')}
+                  />
 
-              {/* Lower F (Right Stage: Emerald) */}
-              <path
-                d="M 465,160 A 145,145 0 0,1 505,235 L 465,245 A 105,105 0 0,0 435,190 Z"
-                fill="#10b981"
-                opacity={activeConcertStand === 'ALL' || activeConcertStand === 'LOWER_CF' ? 0.95 : 0.35}
-                className="cursor-pointer transition-all hover:opacity-100 hover:brightness-125"
-                onClick={() => setActiveConcertStand(activeConcertStand === 'LOWER_CF' ? 'ALL' : 'LOWER_CF')}
-              />
-              <text x="475" y="200" fill="#000" fontSize="10" fontWeight="900" textAnchor="middle">LOWER F</text>
-              <text x="475" y="213" fill="#000" fontSize="8" fontWeight="800" textAnchor="middle">₹3,000</text>
+                  {/* ---------------- STANDING (FLOOR) ARENA ---------------- */}
+                  <circle
+                    cx="300"
+                    cy="270"
+                    r="110"
+                    fill="#6366f1"
+                    stroke={activeConcertStand === 'FLOOR' ? '#ffffff' : '#818cf8'}
+                    strokeWidth={activeConcertStand === 'FLOOR' ? 4 : 2.5}
+                    opacity={activeConcertStand === 'FLOOR' ? 1 : 0.85}
+                    className="cursor-pointer transition-all duration-200 hover:brightness-110 hover:stroke-white"
+                    onClick={() => setActiveConcertStand('FLOOR')}
+                  />
 
-              {/* Lower B (Left Mid: Cyan) */}
-              <path
-                d="M 195,245 A 145,145 0 0,0 215,320 L 255,305 A 105,105 0 0,1 240,250 Z"
-                fill="#06b6d4"
-                opacity={activeConcertStand === 'ALL' || activeConcertStand === 'LOWER_BG' ? 0.95 : 0.35}
-                className="cursor-pointer transition-all hover:opacity-100 hover:brightness-125"
-                onClick={() => setActiveConcertStand(activeConcertStand === 'LOWER_BG' ? 'ALL' : 'LOWER_BG')}
-              />
-              <text x="225" y="280" fill="#000" fontSize="10" fontWeight="900" textAnchor="middle">LOWER B</text>
-              <text x="225" y="293" fill="#000" fontSize="8" fontWeight="800" textAnchor="middle">₹4,500</text>
+                  {/* Sound mixing tents / delay towers */}
+                  <rect x="245" y="275" width="20" height="24" rx="4" fill="#ffffff" opacity="0.85" />
+                  <rect x="335" y="275" width="20" height="24" rx="4" fill="#ffffff" opacity="0.85" />
+                  <rect x="270" y="325" width="22" height="15" rx="3" fill="#ffffff" opacity="0.85" />
+                  <rect x="308" y="325" width="22" height="15" rx="3" fill="#ffffff" opacity="0.85" />
 
-              {/* Lower G (Right Mid: Cyan) */}
-              <path
-                d="M 505,245 A 145,145 0 0,1 485,320 L 445,305 A 105,105 0 0,0 460,250 Z"
-                fill="#06b6d4"
-                opacity={activeConcertStand === 'ALL' || activeConcertStand === 'LOWER_BG' ? 0.95 : 0.35}
-                className="cursor-pointer transition-all hover:opacity-100 hover:brightness-125"
-                onClick={() => setActiveConcertStand(activeConcertStand === 'LOWER_BG' ? 'ALL' : 'LOWER_BG')}
-              />
-              <text x="475" y="280" fill="#000" fontSize="10" fontWeight="900" textAnchor="middle">LOWER G</text>
-              <text x="475" y="293" fill="#000" fontSize="8" fontWeight="800" textAnchor="middle">₹4,500</text>
+                  {/* Runway / Catwalk */}
+                  <rect x="295" y="130" width="10" height="90" fill="#ffffff" opacity="0.9" />
+                  <circle cx="300" cy="220" r="16" fill="#ffffff" opacity="0.9" />
 
-              {/* Lower A (Left Front Wing: Sky Blue) */}
-              <path
-                d="M 220,330 A 145,145 0 0,0 270,390 L 295,355 A 105,105 0 0,1 260,312 Z"
-                fill="#38bdf8"
-                opacity={activeConcertStand === 'ALL' || activeConcertStand === 'LOWER_AH' ? 0.95 : 0.35}
-                className="cursor-pointer transition-all hover:opacity-100 hover:brightness-125"
-                onClick={() => setActiveConcertStand(activeConcertStand === 'LOWER_AH' ? 'ALL' : 'LOWER_AH')}
-              />
-              <text x="260" y="355" fill="#000" fontSize="10" fontWeight="900" textAnchor="middle">LOWER A</text>
-              <text x="260" y="367" fill="#000" fontSize="8" fontWeight="800" textAnchor="middle">₹9,500</text>
+                  {/* ---------------- MAIN STAGE ---------------- */}
+                  <rect
+                    x="200"
+                    y="55"
+                    width="200"
+                    height="75"
+                    rx="8"
+                    fill="#ffffff"
+                    stroke="#38bdf8"
+                    strokeWidth="3.5"
+                    className="filter drop-shadow-[0_0_25px_rgba(56,189,248,0.75)]"
+                  />
+                  <text x="300" y="100" fill="#0f172a" fontSize="19" fontWeight="900" letterSpacing="4" textAnchor="middle">
+                    STAGE
+                  </text>
+                </svg>
+              </div>
+            </div>
 
-              {/* Lower H (Right Front Wing: Sky Blue) */}
-              <path
-                d="M 480,330 A 145,145 0 0,1 430,390 L 405,355 A 105,105 0 0,0 440,312 Z"
-                fill="#38bdf8"
-                opacity={activeConcertStand === 'ALL' || activeConcertStand === 'LOWER_AH' ? 0.95 : 0.35}
-                className="cursor-pointer transition-all hover:opacity-100 hover:brightness-125"
-                onClick={() => setActiveConcertStand(activeConcertStand === 'LOWER_AH' ? 'ALL' : 'LOWER_AH')}
-              />
-              <text x="440" y="355" fill="#000" fontSize="10" fontWeight="900" textAnchor="middle">LOWER H</text>
-              <text x="440" y="367" fill="#000" fontSize="8" fontWeight="800" textAnchor="middle">₹9,500</text>
-
-              {/* ---------------- SOUTH PREMIUM (CENTER ELEVATED) ---------------- */}
-              <path
-                d="M 285,400 A 145,145 0 0,0 415,400 L 398,348 A 95,95 0 0,1 302,348 Z"
-                fill="#f59e0b"
-                opacity={activeConcertStand === 'ALL' || activeConcertStand === 'SOUTH_PREMIUM' ? 1 : 0.4}
-                className="cursor-pointer transition-all hover:opacity-100 hover:brightness-125 filter drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]"
-                onClick={() => setActiveConcertStand(activeConcertStand === 'SOUTH_PREMIUM' ? 'ALL' : 'SOUTH_PREMIUM')}
-              />
-              <text x="350" y="375" fill="#000" fontSize="11" fontWeight="900" textAnchor="middle">SOUTH PREMIUM</text>
-              <text x="350" y="390" fill="#000" fontSize="9" fontWeight="900" textAnchor="middle">West · Center · East (₹12,500)</text>
-
-              {/* ---------------- STANDING (FLOOR) ARENA ---------------- */}
-              <circle
-                cx="350"
-                cy="260"
-                r="95"
-                fill="#c8a364"
-                stroke="#d4af37"
-                strokeWidth="3"
-                opacity={activeConcertStand === 'ALL' || activeConcertStand === 'FLOOR' ? 0.95 : 0.45}
-                className="cursor-pointer transition-all hover:opacity-100 hover:brightness-110"
-                onClick={() => setActiveConcertStand(activeConcertStand === 'FLOOR' ? 'ALL' : 'FLOOR')}
-              />
-
-              {/* Sound mixing tents / delay towers */}
-              <rect x="300" y="270" width="16" height="22" rx="3" fill="#ffffff" opacity="0.85" />
-              <rect x="384" y="270" width="16" height="22" rx="3" fill="#ffffff" opacity="0.85" />
-              <rect x="320" y="315" width="18" height="12" rx="2" fill="#ffffff" opacity="0.85" />
-              <rect x="362" y="315" width="18" height="12" rx="2" fill="#ffffff" opacity="0.85" />
-
-              {/* Runway / Catwalk */}
-              <rect x="345" y="150" width="10" height="70" fill="#ffffff" opacity="0.9" />
-              <circle cx="350" cy="220" r="14" fill="#ffffff" opacity="0.9" />
-
-              {/* Standing Floor Label */}
-              <text x="350" y="250" fill="#000" fontSize="12" fontWeight="900" textAnchor="middle">STANDING (FLOOR)</text>
-              <text x="350" y="266" fill="#000" fontSize="10" fontWeight="800" textAnchor="middle">₹6,450</text>
-
-              {/* ---------------- MAIN STAGE ---------------- */}
-              <rect
-                x="260"
-                y="85"
-                width="180"
-                height="65"
-                rx="8"
-                fill="#ffffff"
-                stroke="#38bdf8"
-                strokeWidth="3"
-                className="filter drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]"
-              />
-              <text x="350" y="125" fill="#0f172a" fontSize="18" fontWeight="900" letterSpacing="3" textAnchor="middle">
-                STAGE
-              </text>
-            </svg>
-          </div>
-
-          {/* Stand Category Selector Bar */}
-          <div className="stand-filter-tabs">
-            <button
-              className={`stand-tab ${activeConcertStand === 'ALL' ? 'active' : ''}`}
-              onClick={() => setActiveConcertStand('ALL')}
-            >
-              🏟️ All Stadium Stands
-            </button>
-            {concertStands.map(stand => (
-              <button
-                key={stand.id}
-                className={`stand-tab ${activeConcertStand === stand.id ? 'active' : ''}`}
-                style={{
-                  borderColor: activeConcertStand === stand.id ? stand.color : undefined,
-                }}
-                onClick={() => setActiveConcertStand(stand.id)}
-              >
-                <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: stand.color }} />
-                <span>{stand.name.split(' (')[0]}</span>
-                <span className="text-xs font-mono opacity-80">₹{stand.price}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Interactive Seats / Passes Grid for Active Stand */}
-          <div className="concert-seats-panel">
-            {filteredConcertStands.map(stand => (
-              <div key={stand.id} className="concert-stand-card" style={{ borderLeftColor: stand.color }}>
-                <div className="concert-stand-header">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: stand.color }} />
-                      <h4 className="font-extrabold text-foreground text-sm sm:text-base">{stand.name}</h4>
-                      <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded bg-surface border border-border">
-                        {stand.tag}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">{stand.description}</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs text-muted-foreground block">Price per ticket</span>
-                    <strong className="text-lg font-black text-amber-400 font-mono">₹{stand.price}</strong>
-                  </div>
+            {/* RIGHT COLUMN: Stand Categories & Active Stand Seat Selection */}
+            <div className="stadium-details-column">
+              
+              {/* Stand Categories Selector (Visible Next to Stage/Arena Block) */}
+              <div className="stadium-categories-panel">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                    <Layers size={14} className="text-sky-400" /> Arena Stands & Categories
+                  </span>
+                  <span className="text-[11px] text-muted-foreground font-medium">
+                    Select stand or click on map
+                  </span>
                 </div>
 
-                {/* Seats / Ticket Pass Units */}
-                <div className="concert-stand-seats">
-                  {stand.seats.map(seat => {
-                    const isSelected = selectedSeats.some(s => s.seat_id === seat.seat_id)
-                    const isBooked = seat.status === 'BOOKED'
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {concertStands.map(s => {
+                    const isCurrent = activeConcertStand === s.id
                     return (
                       <button
-                        key={seat.seat_id}
-                        disabled={isBooked}
-                        className={`concert-seat-pill ${isBooked ? 'booked' : ''} ${isSelected ? 'selected' : ''}`}
-                        onClick={() => onToggleSeat({ ...seat, calculated_price: stand.price })}
-                        onMouseEnter={() => setHoveredSeat({ ...seat, calculated_price: stand.price, standName: stand.name })}
-                        onMouseLeave={() => setHoveredSeat(null)}
+                        key={s.id}
+                        className={`stand-overview-item ${isCurrent ? 'current' : ''}`}
+                        style={{
+                          borderLeftColor: s.color,
+                          borderLeftWidth: '4px'
+                        }}
+                        onClick={() => setActiveConcertStand(s.id)}
                       >
-                        <span className="seat-code">{seat.seat_number}</span>
-                        <span className="seat-status-dot" />
+                        <div className="flex items-center gap-2 truncate">
+                          <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }} />
+                          <span className="truncate text-xs font-bold">{s.name.split(' (')[0]}</span>
+                        </div>
+                        <span className="text-xs font-mono font-black text-amber-400">₹{s.price}</span>
                       </button>
                     )
                   })}
                 </div>
               </div>
-            ))}
-          </div>
 
-          {/* Live Tooltip & Legend matching reference */}
-          <div className="h-6 flex items-center justify-center text-xs font-semibold text-muted-foreground my-2">
-            {hoveredSeat ? (
-              <span className="text-foreground flex items-center gap-2 bg-surface-raised px-3 py-1 rounded-full border border-border">
-                <span className="text-amber-400 font-bold">{hoveredSeat.standName || 'Seat'} · {hoveredSeat.seat_number}</span> · <span className="text-emerald-400 font-mono">₹{hoveredSeat.calculated_price}</span>
-              </span>
-            ) : (
-              <span>Click on any stand above or select seats directly to reserve</span>
-            )}
-          </div>
+              {/* Active Stand Detail & Seat Selection Card */}
+              <div className="active-stand-card" style={{ borderTopColor: activeStandObject.color }}>
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-3.5 h-3.5 rounded-full shadow" style={{ backgroundColor: activeStandObject.color }} />
+                      <h4 className="text-lg font-black text-white">{activeStandObject.name}</h4>
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 mt-1 inline-block rounded bg-[#1e293b] border border-border text-sky-300">
+                      {activeStandObject.tag} · {activeStandObject.viewRating}
+                    </span>
+                  </div>
 
-          {/* Concert Pricing Reference Legend */}
-          <div className="concert-legend-grid">
-            <div className="legend-section-title">SEATED (STANDS)</div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="w-3.5 h-3.5 rounded" style={{ backgroundColor: '#10b981' }} />
-                <span>Lower - C & F (₹3,000)</span>
+                  <div className="text-right">
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground block">TICKET PRICE</span>
+                    <strong className="text-2xl font-black text-amber-400 font-mono">₹{activeStandObject.price}</strong>
+                  </div>
+                </div>
+
+                <p className="text-xs text-muted-foreground mb-4">
+                  {activeStandObject.description}
+                </p>
+
+                {/* Available Seats / Passes in this Stand */}
+                <div className="mb-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                      Select Available Seats / Passes ({activeStandObject.seats.filter(s => s.status !== 'BOOKED').length} left):
+                    </span>
+                  </div>
+
+                  <div className="concert-stand-seats">
+                    {activeStandObject.seats.map(seat => {
+                      const isSelected = selectedSeats.some(s => s.seat_id === seat.seat_id)
+                      const isBooked = seat.status === 'BOOKED'
+                      return (
+                        <button
+                          key={seat.seat_id}
+                          disabled={isBooked}
+                          className={`concert-seat-pill ${isBooked ? 'booked' : ''} ${isSelected ? 'selected' : ''}`}
+                          onClick={() => onToggleSeat({ ...seat, calculated_price: activeStandObject.price })}
+                          onMouseEnter={() => setHoveredSeat({ ...seat, calculated_price: activeStandObject.price, standName: activeStandObject.name })}
+                          onMouseLeave={() => setHoveredSeat(null)}
+                        >
+                          <span className="seat-code">{seat.seat_number}</span>
+                          <span className="seat-status-dot" />
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Live Hover Info */}
+                <div className="h-6 flex items-center text-xs font-semibold text-muted-foreground my-2">
+                  {hoveredSeat ? (
+                    <span className="text-foreground flex items-center gap-2 bg-[#1e293b] px-3 py-1 rounded-full border border-border">
+                      <span className="text-amber-400 font-bold">{hoveredSeat.standName || 'Seat'} · {hoveredSeat.seat_number}</span> · <span className="text-emerald-400 font-mono">₹{hoveredSeat.calculated_price}</span>
+                    </span>
+                  ) : (
+                    <span className="text-[11px] opacity-75">Click on any pill above to add to your order</span>
+                  )}
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3.5 h-3.5 rounded" style={{ backgroundColor: '#06b6d4' }} />
-                <span>Lower - B & G (₹4,500)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3.5 h-3.5 rounded" style={{ backgroundColor: '#38bdf8' }} />
-                <span>Lower - A & H (₹9,500)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3.5 h-3.5 rounded" style={{ backgroundColor: '#f59e0b' }} />
-                <span>South Premium (₹12,500)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3.5 h-3.5 rounded" style={{ backgroundColor: '#f43f5e' }} />
-                <span>Upper - L & P (₹2,500)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3.5 h-3.5 rounded" style={{ backgroundColor: '#c084fc' }} />
-                <span>Upper - K & Q (₹3,500)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3.5 h-3.5 rounded" style={{ backgroundColor: '#fb7185' }} />
-                <span>Upper - J & R (₹6,500)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3.5 h-3.5 rounded" style={{ backgroundColor: '#c8a364' }} />
-                <span>Standing Floor (₹6,450)</span>
-              </div>
+
             </div>
+
           </div>
         </div>
       ) : (
