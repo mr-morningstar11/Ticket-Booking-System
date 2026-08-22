@@ -300,6 +300,23 @@ nav a:hover, nav button:hover, nav button.active {
   border: 1px solid var(--border);
 }
 
+.hero-reel-container {
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 8s linear infinite;
+}
+
 .hero-image {
   height: 100%;
   min-height: 360px;

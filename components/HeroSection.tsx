@@ -1,19 +1,22 @@
 'use client'
 
 import { Search, ArrowRight, X } from 'lucide-react'
+import { ReelGallery } from './ReelGallery'
 
 interface HeroSectionProps {
+  events: any[]
   query: string
   onQueryChange: (q: string) => void
   onExplore: () => void
-  onFeaturedClick: () => void
+  onSelectEvent: (event: any) => void
 }
 
 export function HeroSection({
+  events,
   query,
   onQueryChange,
   onExplore,
-  onFeaturedClick,
+  onSelectEvent,
 }: HeroSectionProps) {
   return (
     <section className="hero-shell">
@@ -45,16 +48,9 @@ export function HeroSection({
         </div>
       </div>
 
-      <div className="hero-art" onClick={onFeaturedClick}>
-        <div className="hero-image" />
-        <div className="hero-stamp">
-          <span>BLOCKBUSTER</span>
-          <strong>IMAX 3D</strong>
-          <small>BOOK NOW</small>
-        </div>
-        <div className="hero-note">
-          Spider-Man: Brand New Day · Click to Book <ArrowRight size={14} />
-        </div>
+      {/* Tilted Reel Gallery in place of static card */}
+      <div className="hero-reel-container flex items-center justify-center">
+        <ReelGallery events={events} onSelectEvent={onSelectEvent} />
       </div>
     </section>
   )

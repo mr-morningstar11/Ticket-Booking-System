@@ -429,13 +429,11 @@ export default function Page() {
       {stage === 'browse' && (
         <>
           <HeroSection
+            events={events}
             query={query}
             onQueryChange={setQuery}
             onExplore={() => document.getElementById('events')?.scrollIntoView({ behavior: 'smooth' })}
-            onFeaturedClick={() => {
-              const spider = events.find(e => e.title?.includes('Spider-Man')) || events[0]
-              if (spider) handleSelectEvent(spider)
-            }}
+            onSelectEvent={handleSelectEvent}
           />
 
           <EventsList
