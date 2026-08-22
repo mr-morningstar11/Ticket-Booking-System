@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { ArrowLeft, ArrowRight, Clock3, Sparkles, User, Info, Check, RotateCcw, MapPin, Disc3, Music2, Layers } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Clock3, Sparkles, User, Info, Check, RotateCcw, MapPin, Disc3, Music2, Layers, Calendar, Play, Volume2 } from 'lucide-react'
 import Orb from './Orb'
 
 interface SeatPickerFlowProps {
@@ -312,19 +312,90 @@ export function SeatPickerFlow({
             />
           </div>
 
-          {/* Concert Tour Subheader Banner */}
-          <div className="concert-stadium-header">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <Sparkles size={16} className="text-amber-400" />
-              <span className="text-xs font-black tracking-widest text-amber-300 uppercase">
-                {selectedEvent.title} · WORLD TOUR ARENA
-              </span>
-              <Sparkles size={16} className="text-amber-400" />
+          {/* Musico-Inspired Concert Tour Artist Hero Banner with Respected Images */}
+          <div className="concert-artist-hero mb-6 relative overflow-hidden rounded-2xl border border-sky-500/25 bg-slate-950/70 backdrop-blur-xl p-4 sm:p-5 shadow-2xl z-10">
+            {/* Artist Stage Backdrop Overlay */}
+            {selectedEvent.banner_url && (
+              <div 
+                className="absolute inset-0 bg-cover bg-center opacity-25 pointer-events-none mix-blend-luminosity filter blur-[1px]"
+                style={{ backgroundImage: `url(${selectedEvent.banner_url})` }}
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/80 to-slate-950/40 pointer-events-none" />
+
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
+              {/* Left: Respected Artist Photo Avatar + Tour Title + Venue */}
+              <div className="flex items-center gap-4 text-left w-full md:w-auto">
+                {selectedEvent.poster_url && (
+                  <div className="relative flex-shrink-0 group">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.4)] bg-slate-800">
+                      <img
+                        src={selectedEvent.poster_url}
+                        alt={selectedEvent.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                    </div>
+                    <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border border-slate-900"></span>
+                    </span>
+                  </div>
+                )}
+
+                <div>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Sparkles size={14} className="text-amber-400" />
+                    <span className="text-[11px] font-black tracking-widest text-amber-300 uppercase">
+                      {selectedEvent.title} · WORLD TOUR ARENA
+                    </span>
+                    <Sparkles size={14} className="text-amber-400" />
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-wide">
+                    {selectedShow.venue_name.toUpperCase()}
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-sky-200 mt-1 font-medium">
+                    <span className="flex items-center gap-1">
+                      <Calendar size={13} className="text-sky-400" />
+                      {selectedShow.show_date}
+                    </span>
+                    <span>•</span>
+                    <span className="flex items-center gap-1">
+                      <Clock3 size={13} className="text-amber-400" />
+                      {selectedShow.start_time || '07:00 PM'}
+                    </span>
+                    {selectedEvent.artist && (
+                      <>
+                        <span>•</span>
+                        <span className="text-amber-300 font-bold">Artist: {selectedEvent.artist}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Musico Live Waveform / Audio Track Preview Card */}
+              <div className="flex items-center gap-3 bg-slate-900/90 border border-sky-500/30 rounded-xl px-4 py-2.5 shadow-lg backdrop-blur-md self-stretch md:self-auto justify-between md:justify-start">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center text-slate-950 shadow-md flex-shrink-0">
+                  <Music2 size={20} className="animate-bounce" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-black text-white uppercase tracking-wider">Live Tour Audio</span>
+                    <span className="text-[9px] px-1.5 py-0.5 bg-rose-500/20 text-rose-400 border border-rose-500/40 rounded font-bold uppercase">LIVE</span>
+                  </div>
+                  {/* Animated Sound Waveform Bars */}
+                  <div className="flex items-center gap-1 mt-1 h-3.5">
+                    <span className="w-1 bg-amber-400 rounded-full animate-[pulse_0.6s_ease-in-out_infinite] h-3" />
+                    <span className="w-1 bg-rose-400 rounded-full animate-[pulse_0.8s_ease-in-out_infinite] h-4" />
+                    <span className="w-1 bg-sky-400 rounded-full animate-[pulse_0.5s_ease-in-out_infinite] h-2.5" />
+                    <span className="w-1 bg-emerald-400 rounded-full animate-[pulse_0.9s_ease-in-out_infinite] h-3.5" />
+                    <span className="w-1 bg-purple-400 rounded-full animate-[pulse_0.7s_ease-in-out_infinite] h-2" />
+                    <span className="w-1 bg-amber-400 rounded-full animate-[pulse_0.4s_ease-in-out_infinite] h-3.5" />
+                    <span className="text-[10px] text-slate-300 ml-1.5 font-mono">320kbps Stadium Mix</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <h3 className="text-xl sm:text-2xl font-black text-white tracking-wide">
-              {selectedShow.venue_name.toUpperCase()}
-            </h3>
-            <p className="text-xs text-sky-200 opacity-90">{selectedShow.show_date}</p>
           </div>
 
           {/* Side-by-Side 2-Column Split: Enlarged Inner-Circle Map on Left, Stand Details on Right */}
