@@ -176,7 +176,8 @@ export function SeatPickerFlow({
         name: 'Standing (Floor)',
         tag: 'GENERAL ADMISSION',
         price: Math.round(basePrice * 2.5),
-        color: '#6366f1', // Electric Indigo
+        color: '#6366f1',
+        gradient: 'linear-gradient(135deg, #818cf8, #4f46e5)',
         textColor: '#ffffff',
         seats: showSeats.filter(s => s.row_label === 'A' || s.row_label === 'B'),
         description: 'Direct Stage & Runway Front Access · Unreserved Standing Arena',
@@ -188,7 +189,8 @@ export function SeatPickerFlow({
         name: 'South Premium',
         tag: 'VVIP ELEVATED',
         price: Math.round(basePrice * 4.8),
-        color: '#f59e0b', // Radiant Gold
+        color: '#f59e0b',
+        gradient: 'linear-gradient(135deg, #fde047, #d97706)',
         textColor: '#000000',
         seats: showSeats.filter(s => s.row_label === 'H'),
         description: 'Prime Center Elevated Panoramic Direct Stage Perspective',
@@ -200,7 +202,8 @@ export function SeatPickerFlow({
         name: 'Lower Stand - A & H',
         tag: 'LOWER BOWL',
         price: Math.round(basePrice * 3.6),
-        color: '#06b6d4', // Electric Cyan Turquoise
+        color: '#06b6d4',
+        gradient: 'linear-gradient(135deg, #38bdf8, #0284c7)',
         textColor: '#000000',
         seats: showSeats.filter(s => s.row_label === 'F' || s.row_label === 'G'),
         description: 'Close Proximity Wing Stands with Direct Performer Sightline',
@@ -212,7 +215,8 @@ export function SeatPickerFlow({
         name: 'Lower Stand - B & G',
         tag: 'LOWER BOWL',
         price: Math.round(basePrice * 1.8),
-        color: '#10b981', // Bright Emerald Mint
+        color: '#10b981',
+        gradient: 'linear-gradient(135deg, #34d399, #059669)',
         textColor: '#000000',
         seats: showSeats.filter(s => s.row_label === 'D' || s.row_label === 'E'),
         description: 'Side Lower Tier Arena View with Crystal Clear Acoustics',
@@ -224,7 +228,8 @@ export function SeatPickerFlow({
         name: 'Lower Stand - C & F',
         tag: 'LOWER BOWL',
         price: Math.round(basePrice * 1.2),
-        color: '#ef4444', // Vibrant Crimson Red
+        color: '#ef4444',
+        gradient: 'linear-gradient(135deg, #fb7185, #b91c1c)',
         textColor: '#ffffff',
         seats: showSeats.filter(s => s.row_label === 'C'),
         description: 'Side Stage Wing Seating with Close Performer Proximity',
@@ -333,11 +338,46 @@ export function SeatPickerFlow({
                   className="w-full max-w-[540px] mx-auto filter drop-shadow-[0_20px_40px_rgba(0,0,0,0.9)]"
                 >
                   <defs>
-                    <radialGradient id="stadiumGrass" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stopColor="#132338" />
-                      <stop offset="70%" stopColor="#0a121e" />
-                      <stop offset="100%" stopColor="#05080e" />
+                    {/* Floor Area Gradient */}
+                    <radialGradient id="gradFloor" cx="50%" cy="40%" r="65%">
+                      <stop offset="0%" stopColor="#818cf8" />
+                      <stop offset="55%" stopColor="#6366f1" />
+                      <stop offset="100%" stopColor="#4338ca" />
                     </radialGradient>
+
+                    {/* South Premium Gradient */}
+                    <linearGradient id="gradSouthPrem" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#fde047" />
+                      <stop offset="50%" stopColor="#f59e0b" />
+                      <stop offset="100%" stopColor="#d97706" />
+                    </linearGradient>
+
+                    {/* Lower Stand A & H (Cyan) */}
+                    <linearGradient id="gradLowerAH" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#38bdf8" />
+                      <stop offset="55%" stopColor="#06b6d4" />
+                      <stop offset="100%" stopColor="#0284c7" />
+                    </linearGradient>
+
+                    {/* Lower Stand B & G (Emerald Mint) */}
+                    <linearGradient id="gradLowerBG" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#34d399" />
+                      <stop offset="55%" stopColor="#10b981" />
+                      <stop offset="100%" stopColor="#047857" />
+                    </linearGradient>
+
+                    {/* Lower Stand C & F (Crimson Rose) */}
+                    <linearGradient id="gradLowerCF" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#fb7185" />
+                      <stop offset="50%" stopColor="#ef4444" />
+                      <stop offset="100%" stopColor="#b91c1c" />
+                    </linearGradient>
+
+                    {/* Main Stage Gradient */}
+                    <linearGradient id="gradStage" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="#ffffff" />
+                      <stop offset="100%" stopColor="#e0f2fe" />
+                    </linearGradient>
                   </defs>
 
                   {/* Stadium Base Plate (Transparent / Subtle Dashed Outline) */}
@@ -347,10 +387,10 @@ export function SeatPickerFlow({
                   {/* Lower C */}
                   <path
                     d={lowerCPath}
-                    fill="#ef4444"
+                    fill="url(#gradLowerCF)"
                     stroke={activeConcertStand === 'LOWER_CF' ? '#ffffff' : '#1e293b'}
                     strokeWidth={activeConcertStand === 'LOWER_CF' ? 4 : 2}
-                    opacity={activeConcertStand === 'LOWER_CF' ? 1 : 0.85}
+                    opacity={activeConcertStand === 'LOWER_CF' ? 1 : 0.9}
                     className="cursor-pointer transition-all duration-200 hover:brightness-125 hover:stroke-white"
                     onClick={() => setActiveConcertStand('LOWER_CF')}
                   />
@@ -358,10 +398,10 @@ export function SeatPickerFlow({
                   {/* Lower F */}
                   <path
                     d={lowerFPath}
-                    fill="#ef4444"
+                    fill="url(#gradLowerCF)"
                     stroke={activeConcertStand === 'LOWER_CF' ? '#ffffff' : '#1e293b'}
                     strokeWidth={activeConcertStand === 'LOWER_CF' ? 4 : 2}
-                    opacity={activeConcertStand === 'LOWER_CF' ? 1 : 0.85}
+                    opacity={activeConcertStand === 'LOWER_CF' ? 1 : 0.9}
                     className="cursor-pointer transition-all duration-200 hover:brightness-125 hover:stroke-white"
                     onClick={() => setActiveConcertStand('LOWER_CF')}
                   />
@@ -369,10 +409,10 @@ export function SeatPickerFlow({
                   {/* Lower B */}
                   <path
                     d={lowerBPath}
-                    fill="#10b981"
+                    fill="url(#gradLowerBG)"
                     stroke={activeConcertStand === 'LOWER_BG' ? '#ffffff' : '#1e293b'}
                     strokeWidth={activeConcertStand === 'LOWER_BG' ? 4 : 2}
-                    opacity={activeConcertStand === 'LOWER_BG' ? 1 : 0.85}
+                    opacity={activeConcertStand === 'LOWER_BG' ? 1 : 0.9}
                     className="cursor-pointer transition-all duration-200 hover:brightness-125 hover:stroke-white"
                     onClick={() => setActiveConcertStand('LOWER_BG')}
                   />
@@ -380,10 +420,10 @@ export function SeatPickerFlow({
                   {/* Lower G */}
                   <path
                     d={lowerGPath}
-                    fill="#10b981"
+                    fill="url(#gradLowerBG)"
                     stroke={activeConcertStand === 'LOWER_BG' ? '#ffffff' : '#1e293b'}
                     strokeWidth={activeConcertStand === 'LOWER_BG' ? 4 : 2}
-                    opacity={activeConcertStand === 'LOWER_BG' ? 1 : 0.85}
+                    opacity={activeConcertStand === 'LOWER_BG' ? 1 : 0.9}
                     className="cursor-pointer transition-all duration-200 hover:brightness-125 hover:stroke-white"
                     onClick={() => setActiveConcertStand('LOWER_BG')}
                   />
@@ -391,10 +431,10 @@ export function SeatPickerFlow({
                   {/* Lower A */}
                   <path
                     d={lowerAPath}
-                    fill="#06b6d4"
+                    fill="url(#gradLowerAH)"
                     stroke={activeConcertStand === 'LOWER_AH' ? '#ffffff' : '#1e293b'}
                     strokeWidth={activeConcertStand === 'LOWER_AH' ? 4 : 2}
-                    opacity={activeConcertStand === 'LOWER_AH' ? 1 : 0.85}
+                    opacity={activeConcertStand === 'LOWER_AH' ? 1 : 0.9}
                     className="cursor-pointer transition-all duration-200 hover:brightness-125 hover:stroke-white"
                     onClick={() => setActiveConcertStand('LOWER_AH')}
                   />
@@ -402,10 +442,10 @@ export function SeatPickerFlow({
                   {/* Lower H */}
                   <path
                     d={lowerHPath}
-                    fill="#06b6d4"
+                    fill="url(#gradLowerAH)"
                     stroke={activeConcertStand === 'LOWER_AH' ? '#ffffff' : '#1e293b'}
                     strokeWidth={activeConcertStand === 'LOWER_AH' ? 4 : 2}
-                    opacity={activeConcertStand === 'LOWER_AH' ? 1 : 0.85}
+                    opacity={activeConcertStand === 'LOWER_AH' ? 1 : 0.9}
                     className="cursor-pointer transition-all duration-200 hover:brightness-125 hover:stroke-white"
                     onClick={() => setActiveConcertStand('LOWER_AH')}
                   />
@@ -413,11 +453,11 @@ export function SeatPickerFlow({
                   {/* ---------------- SOUTH PREMIUM (CENTER ELEVATED) ---------------- */}
                   <path
                     d={southPremPath}
-                    fill="#f59e0b"
+                    fill="url(#gradSouthPrem)"
                     stroke={activeConcertStand === 'SOUTH_PREMIUM' ? '#ffffff' : '#fbbf24'}
                     strokeWidth={activeConcertStand === 'SOUTH_PREMIUM' ? 4 : 2.5}
-                    opacity={activeConcertStand === 'SOUTH_PREMIUM' ? 1 : 0.85}
-                    className="cursor-pointer transition-all duration-200 hover:brightness-125 hover:stroke-white filter drop-shadow-[0_0_15px_rgba(245,158,11,0.6)]"
+                    opacity={activeConcertStand === 'SOUTH_PREMIUM' ? 1 : 0.9}
+                    className="cursor-pointer transition-all duration-200 hover:brightness-125 hover:stroke-white filter drop-shadow-[0_0_16px_rgba(245,158,11,0.7)]"
                     onClick={() => setActiveConcertStand('SOUTH_PREMIUM')}
                   />
 
@@ -426,23 +466,23 @@ export function SeatPickerFlow({
                     cx="300"
                     cy="270"
                     r="110"
-                    fill="#6366f1"
+                    fill="url(#gradFloor)"
                     stroke={activeConcertStand === 'FLOOR' ? '#ffffff' : '#818cf8'}
                     strokeWidth={activeConcertStand === 'FLOOR' ? 4 : 2.5}
-                    opacity={activeConcertStand === 'FLOOR' ? 1 : 0.85}
+                    opacity={activeConcertStand === 'FLOOR' ? 1 : 0.9}
                     className="cursor-pointer transition-all duration-200 hover:brightness-110 hover:stroke-white"
                     onClick={() => setActiveConcertStand('FLOOR')}
                   />
 
                   {/* Sound mixing tents / delay towers */}
-                  <rect x="245" y="275" width="20" height="24" rx="4" fill="#ffffff" opacity="0.85" />
-                  <rect x="335" y="275" width="20" height="24" rx="4" fill="#ffffff" opacity="0.85" />
-                  <rect x="270" y="325" width="22" height="15" rx="3" fill="#ffffff" opacity="0.85" />
-                  <rect x="308" y="325" width="22" height="15" rx="3" fill="#ffffff" opacity="0.85" />
+                  <rect x="245" y="275" width="20" height="24" rx="4" fill="#ffffff" opacity="0.9" />
+                  <rect x="335" y="275" width="20" height="24" rx="4" fill="#ffffff" opacity="0.9" />
+                  <rect x="270" y="325" width="22" height="15" rx="3" fill="#ffffff" opacity="0.9" />
+                  <rect x="308" y="325" width="22" height="15" rx="3" fill="#ffffff" opacity="0.9" />
 
                   {/* Runway / Catwalk */}
                   <rect x="295" y="130" width="10" height="90" fill="#ffffff" opacity="0.9" />
-                  <circle cx="300" cy="220" r="16" fill="#ffffff" opacity="0.9" />
+                  <circle cx="300" cy="220" r="16" fill="#ffffff" opacity="0.95" />
 
                   {/* ---------------- MAIN STAGE ---------------- */}
                   <rect
@@ -451,10 +491,10 @@ export function SeatPickerFlow({
                     width="200"
                     height="75"
                     rx="8"
-                    fill="#ffffff"
+                    fill="url(#gradStage)"
                     stroke="#38bdf8"
                     strokeWidth="3.5"
-                    className="filter drop-shadow-[0_0_25px_rgba(56,189,248,0.75)]"
+                    className="filter drop-shadow-[0_0_25px_rgba(56,189,248,0.85)]"
                   />
                   <text x="300" y="100" fill="#0f172a" fontSize="19" fontWeight="900" letterSpacing="4" textAnchor="middle">
                     STAGE
@@ -485,13 +525,13 @@ export function SeatPickerFlow({
                         key={s.id}
                         className={`stand-overview-item ${isCurrent ? 'current' : ''}`}
                         style={{
+                          borderLeftWidth: '4px',
                           borderLeftColor: s.color,
-                          borderLeftWidth: '4px'
                         }}
                         onClick={() => setActiveConcertStand(s.id)}
                       >
                         <div className="flex items-center gap-2 truncate">
-                          <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }} />
+                          <span className="w-3.5 h-3.5 rounded-full flex-shrink-0 shadow" style={{ background: s.gradient }} />
                           <span className="truncate text-xs font-bold">{s.name.split(' (')[0]}</span>
                         </div>
                         <span className="text-xs font-mono font-black text-amber-400">₹{s.price}</span>
@@ -502,11 +542,11 @@ export function SeatPickerFlow({
               </div>
 
               {/* Active Stand Detail & Seat Selection Card */}
-              <div className="active-stand-card" style={{ borderTopColor: activeStandObject.color }}>
+              <div className="active-stand-card" style={{ borderTopWidth: '4px', borderTopColor: activeStandObject.color }}>
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="w-3.5 h-3.5 rounded-full shadow" style={{ backgroundColor: activeStandObject.color }} />
+                      <span className="w-4 h-4 rounded-full shadow" style={{ background: activeStandObject.gradient }} />
                       <h4 className="text-lg font-black text-white">{activeStandObject.name}</h4>
                     </div>
                     <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 mt-1 inline-block rounded bg-[#1e293b] border border-border text-sky-300">
