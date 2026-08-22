@@ -40,6 +40,14 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+#events {
+  scroll-margin-top: 90px;
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);

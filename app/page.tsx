@@ -402,7 +402,18 @@ export default function Page() {
           if (newStage === 'bookings') fetchUserBookings()
           if (newStage === 'admin') fetchAdminStats()
           setStage(newStage)
-          window.scrollTo({ top: 0, behavior: 'smooth' })
+
+          if (newStage === 'browse' && newCategory) {
+            // Smoothly scroll down to the events list section
+            setTimeout(() => {
+              const el = document.getElementById('events')
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              }
+            }, 50)
+          } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          }
         }}
         onOpenUserModal={() => setIsUserModalOpen(true)}
         onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -417,12 +428,70 @@ export default function Page() {
               <button className="modal-close" onClick={() => setIsMobileMenuOpen(false)}><X size={16} /></button>
             </div>
             <div className="grid gap-3">
-              <button className="outline-btn text-left justify-start" onClick={() => { setStage('browse'); setCategory('All events'); setIsMobileMenuOpen(false) }}>Discover Events</button>
-              <button className="outline-btn text-left justify-start" onClick={() => { setStage('browse'); setCategory('Movies'); setIsMobileMenuOpen(false) }}>Movies</button>
-              <button className="outline-btn text-left justify-start" onClick={() => { setStage('browse'); setCategory('Upcoming'); setIsMobileMenuOpen(false) }}>✨ Upcoming</button>
-              <button className="outline-btn text-left justify-start" onClick={() => { setStage('browse'); setCategory('Concerts'); setIsMobileMenuOpen(false) }}>Concerts</button>
-              <button className="outline-btn text-left justify-start" onClick={() => { fetchUserBookings(); setStage('bookings'); setIsMobileMenuOpen(false) }}>My Bookings</button>
-              <button className="outline-btn text-left justify-start" onClick={() => { setIsUserModalOpen(true); setIsMobileMenuOpen(false) }}>Switch Profile ({currentUser.name})</button>
+              <button
+                className="outline-btn text-left justify-start"
+                onClick={() => {
+                  setStage('browse')
+                  setCategory('All events')
+                  setIsMobileMenuOpen(false)
+                  setTimeout(() => document.getElementById('events')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
+                }}
+              >
+                Discover Events
+              </button>
+              <button
+                className="outline-btn text-left justify-start"
+                onClick={() => {
+                  setStage('browse')
+                  setCategory('Movies')
+                  setIsMobileMenuOpen(false)
+                  setTimeout(() => document.getElementById('events')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
+                }}
+              >
+                Movies
+              </button>
+              <button
+                className="outline-btn text-left justify-start"
+                onClick={() => {
+                  setStage('browse')
+                  setCategory('Upcoming')
+                  setIsMobileMenuOpen(false)
+                  setTimeout(() => document.getElementById('events')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
+                }}
+              >
+                ✨ Upcoming
+              </button>
+              <button
+                className="outline-btn text-left justify-start"
+                onClick={() => {
+                  setStage('browse')
+                  setCategory('Concerts')
+                  setIsMobileMenuOpen(false)
+                  setTimeout(() => document.getElementById('events')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
+                }}
+              >
+                Concerts
+              </button>
+              <button
+                className="outline-btn text-left justify-start"
+                onClick={() => {
+                  fetchUserBookings()
+                  setStage('bookings')
+                  setIsMobileMenuOpen(false)
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                }}
+              >
+                My Bookings
+              </button>
+              <button
+                className="outline-btn text-left justify-start"
+                onClick={() => {
+                  setIsUserModalOpen(true)
+                  setIsMobileMenuOpen(false)
+                }}
+              >
+                Switch Profile ({currentUser.name})
+              </button>
             </div>
           </div>
         </div>
