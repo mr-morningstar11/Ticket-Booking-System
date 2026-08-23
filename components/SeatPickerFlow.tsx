@@ -108,39 +108,7 @@ export function SeatPickerFlow({
       rows: { rowLabel: string; seats: any[] }[]
     }[] = []
 
-    if (rowsMap['H'] && rowsMap['H'].length > 0) {
-      result.push({
-        category: 'VVIP',
-        title: 'VVIP / RECLINERS',
-        multiplier: 2.4,
-        price: Math.round(selectedShow.ticket_price * 2.4),
-        rows: [{ rowLabel: 'H', seats: rowsMap['H'] }],
-      })
-    }
-
-    const vipRows = ['G', 'F'].filter(r => rowsMap[r] && rowsMap[r].length > 0).map(r => ({ rowLabel: r, seats: rowsMap[r] }))
-    if (vipRows.length > 0) {
-      result.push({
-        category: 'VIP',
-        title: 'VIP CLUB',
-        multiplier: 1.8,
-        price: Math.round(selectedShow.ticket_price * 1.8),
-        rows: vipRows,
-      })
-    }
-
-    const premiumRows = ['E', 'D'].filter(r => rowsMap[r] && rowsMap[r].length > 0).map(r => ({ rowLabel: r, seats: rowsMap[r] }))
-    if (premiumRows.length > 0) {
-      result.push({
-        category: 'PREMIUM',
-        title: 'PREMIUM PRIME',
-        multiplier: 1.4,
-        price: Math.round(selectedShow.ticket_price * 1.4),
-        rows: premiumRows,
-      })
-    }
-
-    const standardRows = ['C', 'B', 'A'].filter(r => rowsMap[r] && rowsMap[r].length > 0).map(r => ({ rowLabel: r, seats: rowsMap[r] }))
+    const standardRows = ['A', 'B', 'C'].filter(r => rowsMap[r] && rowsMap[r].length > 0).map(r => ({ rowLabel: r, seats: rowsMap[r] }))
     if (standardRows.length > 0) {
       result.push({
         category: 'STANDARD',
@@ -151,8 +119,40 @@ export function SeatPickerFlow({
       })
     }
 
+    const premiumRows = ['D', 'E'].filter(r => rowsMap[r] && rowsMap[r].length > 0).map(r => ({ rowLabel: r, seats: rowsMap[r] }))
+    if (premiumRows.length > 0) {
+      result.push({
+        category: 'PREMIUM',
+        title: 'PREMIUM PRIME',
+        multiplier: 1.4,
+        price: Math.round(selectedShow.ticket_price * 1.4),
+        rows: premiumRows,
+      })
+    }
+
+    const vipRows = ['F', 'G'].filter(r => rowsMap[r] && rowsMap[r].length > 0).map(r => ({ rowLabel: r, seats: rowsMap[r] }))
+    if (vipRows.length > 0) {
+      result.push({
+        category: 'VIP',
+        title: 'VIP CLUB',
+        multiplier: 1.8,
+        price: Math.round(selectedShow.ticket_price * 1.8),
+        rows: vipRows,
+      })
+    }
+
+    if (rowsMap['H'] && rowsMap['H'].length > 0) {
+      result.push({
+        category: 'VVIP',
+        title: 'VVIP / RECLINERS',
+        multiplier: 2.4,
+        price: Math.round(selectedShow.ticket_price * 2.4),
+        rows: [{ rowLabel: 'H', seats: rowsMap['H'] }],
+      })
+    }
+
     if (result.length === 0) {
-      const allRows = Object.keys(rowsMap).sort().reverse().map(r => ({ rowLabel: r, seats: rowsMap[r] }))
+      const allRows = Object.keys(rowsMap).sort().map(r => ({ rowLabel: r, seats: rowsMap[r] }))
       result.push({
         category: 'STANDARD',
         title: 'SEATING SECTION',

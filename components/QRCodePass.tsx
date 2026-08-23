@@ -109,11 +109,10 @@ export function QRCodePass({
             {normalizedSeats.map((seat, index) => (
               <button
                 key={seat.seat_number}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
-                  activeSeatIndex === index
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${activeSeatIndex === index
                     ? 'bg-primary text-primary-foreground border-primary shadow-md'
                     : 'bg-surface-raised border-border text-foreground hover:border-muted-foreground'
-                }`}
+                  }`}
                 onClick={() => setActiveSeatIndex(index)}
               >
                 Seat {seat.seat_number}
