@@ -1,4 +1,4 @@
-# 🎟️ Next-Gen Ticket Booking & Event Management System
+# 🎟️Ticket Booking System
 
 A full-stack, real-time ticket booking web application built with **Next.js 16 (App Router)**, **React 19**, **Tailwind CSS**, and **SQLite**. Designed with premium aesthetics, rich animations, and an interactive seating engine supporting both **Cinema Theaters** and **Concentric Stadium Concert Arenas**.
 
