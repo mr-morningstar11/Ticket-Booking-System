@@ -168,7 +168,7 @@ export function SeatPickerFlow({
   // Concentric Inner-Circle Stadium Stands
   const concertStands = useMemo(() => {
     const basePrice = selectedShow.ticket_price || 2500
-    
+
     return [
       {
         id: 'FLOOR',
@@ -316,7 +316,7 @@ export function SeatPickerFlow({
           <div className="concert-artist-hero mb-6 relative overflow-hidden rounded-2xl border border-sky-500/25 bg-slate-950/70 backdrop-blur-xl p-4 sm:p-5 shadow-2xl z-10">
             {/* Artist Stage Backdrop Overlay */}
             {selectedEvent.banner_url && (
-              <div 
+              <div
                 className="absolute inset-0 bg-cover bg-center opacity-25 pointer-events-none mix-blend-luminosity filter blur-[1px]"
                 style={{ backgroundImage: `url(${selectedEvent.banner_url})` }}
               />
@@ -400,7 +400,7 @@ export function SeatPickerFlow({
 
           {/* Side-by-Side 2-Column Split: Enlarged Inner-Circle Map on Left, Stand Details on Right */}
           <div className="stadium-split-layout">
-            
+
             {/* LEFT COLUMN: Enlarged Inner-Circle Stadium Map */}
             <div className="stadium-map-column">
               <div className="stadium-map-wrapper w-full">
@@ -576,7 +576,7 @@ export function SeatPickerFlow({
 
             {/* RIGHT COLUMN: Stand Categories & Active Stand Seat Selection */}
             <div className="stadium-details-column">
-              
+
               {/* Stand Categories Selector (Visible Next to Stage/Arena Block) */}
               <div className="stadium-categories-panel">
                 <div className="flex items-center justify-between mb-2">
